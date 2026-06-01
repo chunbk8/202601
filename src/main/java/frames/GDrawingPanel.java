@@ -1,10 +1,9 @@
 package frames;
 
 import global.GConstants;
-import shape.GOval;
 import shape.GShape;
-import shape.GRectangle;
 import transformer.GDrawer;
+import transformer.GScaler;
 import transformer.GTransformer;
 import transformer.GTranslator;
 
@@ -100,7 +99,7 @@ public class GDrawingPanel extends JPanel {
                         this.transformer = new GTranslator(shape) {
                         };
                     } else { //resize
-                        this.transformer = new GDrawer(shape);
+                        this.transformer = new GScaler(shape);
                     }
                     this.transformer.start(x, y);
                     break;
@@ -123,12 +122,16 @@ public class GDrawingPanel extends JPanel {
         bufferGraphics.fillRect(0, 0, this.getWidth(), this.getHeight());
         bufferGraphics.setColor(Color.BLACK);
 
-        this.transformer.keep(x, y);
-        //상태에 따라
-        //+트랜스폼이 널인 경우를 체크해서 해결해야함
+        if (this.transformer != null) {
+            this.transformer.keep(x, y);
+        }
 
         for (GShape shape : this.shapes) {
             shape.draw(bufferGraphics);
+
+            if (toolBar.getShapeType() == GConstants.EShapeType.eSelect) {
+                shape.drawAnchors(bufferGraphics);
+            }
         }
 
         bufferGraphics.dispose();
@@ -136,13 +139,20 @@ public class GDrawingPanel extends JPanel {
 
     }
 
+
+
     private void continueDrawing(int x, int y) {
-        this.transformer.cont(x,y);
+        if (this.transformer != null) {
+            this.transformer.cont(x,y);
+        }
+
     }
 
     private void finishTransform(int x, int y) {
-        this.transformer.finish(x, y);
-        this.transformer = null;
+        if (this.transformer != null) {
+            this.transformer.finish(x, y);
+            this.transformer = null;
+        }
     }
 
     private class MouseHandler implements MouseListener, MouseMotionListener {

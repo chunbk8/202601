@@ -26,9 +26,11 @@ public class GTranslator extends GTransformer {
         int dy = y-y0;
 
        shape.translate(dx, dy);
+
+       //다음 이동 계산을 위한 기준점 갱신
         this.x0 = x;
         this.y0 = y;
-        //무슨 의미?
+
 
     }
     @Override
